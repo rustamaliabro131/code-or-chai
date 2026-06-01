@@ -1,13 +1,37 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ProductCard } from "@/components/ProductCard";
-import { initDb, getProducts } from "@/lib/db";
-import { Package, Shield, Truck, CreditCard } from "lucide-react";
+import { Product } from "@/lib/types";
+import { Package, Shield, Truck, CreditCard, Loader2 } from "lucide-react";
 
 export default function Home() {
-  initDb();
-  const products = getProducts() as any[];
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("/api/products");
+      const data = await res.json();
+      setProducts(data.products || []);
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const featuredProducts = products.slice(0, 4);
+  const electronicsCount = products.filter(p => p.category === "Electronics").length;
+  const fashionCount = products.filter(p => p.category === "Fashion").length;
+  const homeCount = products.filter(p => p.category === "Home").length;
+  const sportsCount = products.filter(p => p.category === "Sports").length;
 
   return (
     <div>
@@ -35,6 +59,7 @@ export default function Home() {
                   width={600}
                   height={400}
                   className="relative rounded-2xl shadow-2xl"
+                  priority
                 />
               </div>
             </div>
@@ -87,11 +112,24 @@ export default function Home() {
               View All →
             </Link>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="w-12 h-12 text-primary animate-spin" />
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <p className="text-slate-500 text-lg">No products available yet.</p>
+              <Link href="/products" className="text-primary hover:underline mt-4 inline-block">
+                Browse all products →
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -101,10 +139,10 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-8 text-center">Shop by Category</h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400", count: products.filter(p => p.category === "Electronics").length },
-              { name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400", count: products.filter(p => p.category === "Fashion").length },
-              { name: "Home", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400", count: products.filter(p => p.category === "Home").length },
-              { name: "Sports", image: "https://images.unsplash.com/photo-1461896836934- voices718d?w=400", count: products.filter(p => p.category === "Sports").length },
+              { name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400", count: electronicsCount },
+              { name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=400", count: fashionCount },
+              { name: "Home", image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400", count: homeCount },
+              { name: "Sports", image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400", count: sportsCount },
             ].map((category) => (
               <Link 
                 key={category.name}

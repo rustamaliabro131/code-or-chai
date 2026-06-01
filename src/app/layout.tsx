@@ -6,6 +6,9 @@ import { Providers } from "@/components/Providers";
 export const metadata: Metadata = {
   title: "ShopEase - Modern E-Commerce",
   description: "Your one-stop shop for premium products",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
