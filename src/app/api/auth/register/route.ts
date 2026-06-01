@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { initDb, getUserByEmail, createUser as dbCreateUser, getUserById } from "@/lib/db";
+import db, { initDb, getUserByEmail, getUserById } from "@/lib/db";
 
 const JWT_SECRET = process.env.JWT_SECRET || "shopease-secret-key-2024";
 
@@ -25,9 +25,8 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
     
-    const result = (await import("@/lib/db")).default.prepare(
-      "INSERT INTO users (email, password, name) VALUES (?, ?, ?)"
-    ).run(email, hashedPassword, name);
+    const stmt = db.prepare("INSERT INTO users (email, password, name) VALUES (?, ?, ?)");
+    const result = stmt.run(email, hashedPassword, name);
 
     const user = getUserById(result.lastInsertRowid as number) as any;
 

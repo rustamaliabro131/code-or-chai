@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/Providers";
+import { useAuthStore } from "@/store/auth";
 import { User, Mail, Lock, Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const register = useAuthStore((state) => state.register);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +36,7 @@ export default function RegisterPage() {
       await register(email, password, name);
       router.push("/");
     } catch (err: any) {
-      setError(err.message || "Failed to register");
+      setError(err.message || "Failed to register. Please try again.");
     } finally {
       setLoading(false);
     }

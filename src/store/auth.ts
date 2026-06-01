@@ -28,12 +28,12 @@ export const useAuthStore = create<AuthStore>()(
             body: JSON.stringify({ email, password }),
           });
           
+          const data = await res.json();
+          
           if (!res.ok) {
-            const data = await res.json();
             throw new Error(data.error || "Login failed");
           }
           
-          const data = await res.json();
           set({ user: data.user, token: data.token, isLoading: false });
         } catch (error) {
           set({ isLoading: false });
@@ -50,12 +50,12 @@ export const useAuthStore = create<AuthStore>()(
             body: JSON.stringify({ email, password, name }),
           });
           
+          const data = await res.json();
+          
           if (!res.ok) {
-            const data = await res.json();
             throw new Error(data.error || "Registration failed");
           }
           
-          const data = await res.json();
           set({ user: data.user, token: data.token, isLoading: false });
         } catch (error) {
           set({ isLoading: false });

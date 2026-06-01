@@ -21,7 +21,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ user });
+    return NextResponse.json({ 
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        isAdmin: Boolean(user.isAdmin),
+        createdAt: user.createdAt,
+      }
+    });
   } catch (error) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
